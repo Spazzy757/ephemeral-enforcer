@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ephemeral-enforcer
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["secrets", "configmaps", "services"]
+  verbs: ["delete", "watch", "list"]
+- apiGroups: ["apps"] # "" indicates the core API group
+  resources: ["deployments", "statefulsets"]
+  verbs: ["delete", "watch", "list"]

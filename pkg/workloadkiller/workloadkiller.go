@@ -50,7 +50,7 @@ func getDeleteList(resourceList []helpers.EphemeralChecks) []string {
 	return deleteList
 }
 
-func deleteDeployments(clientset *kubernetes.Clientset, namespace *string) {
+func deleteDeployments(clientset kubernetes.Interface, namespace *string) {
 	client := clientset.AppsV1().Deployments(*namespace)
 	deployments, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -77,7 +77,7 @@ func deleteDeployments(clientset *kubernetes.Clientset, namespace *string) {
 
 }
 
-func deleteStatefulsets(clientset *kubernetes.Clientset, namespace *string) {
+func deleteStatefulsets(clientset kubernetes.Interface, namespace *string) {
 	client := clientset.AppsV1().StatefulSets(*namespace)
 	statefulsets, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

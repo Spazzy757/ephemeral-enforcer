@@ -10,6 +10,14 @@ import (
 	"os"
 )
 
+/*
+KillWorkloads runs delete on all of the following in the namespace:
+- deployments
+- statefulsets
+- services
+- secrets
+- configmaps
+*/
 func KillWorkloads(kubeconfig *rest.Config) {
 
 	// creates the clientset

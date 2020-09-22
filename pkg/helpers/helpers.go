@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+/*
+GetConfig Gets the Kubernetes config from either your local (if you are running it locally)
+or from the service account if you are running it in cluster
+*/
 func GetConfig() *rest.Config {
 	if os.Getenv("IN_CLUSTER") != "true" {
 		var kubeconfig *string
@@ -27,13 +31,12 @@ func GetConfig() *rest.Config {
 			panic(err.Error())
 		}
 		return config
-	} else {
-		config, err := rest.InClusterConfig()
-		if err != nil {
-			panic(err.Error())
-		}
-		return config
 	}
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+	return config
 }
 
 func homeDir() string {
@@ -43,12 +46,18 @@ func homeDir() string {
 	return os.Getenv("USERPROFILE") // windows
 }
 
+/*
+EphemeralChecks Struct that holds the information of the resources that could be deleted
+*/
 type EphemeralChecks struct {
 	CreationTime metav1.Time
 	Name         string
 	Delete       bool
 }
 
+/*
+RunChecks Run checks to see if resource should be deleted
+*/
 func (e *EphemeralChecks) RunChecks() {
 	// Run The check to see if the age is past the TTL
 	if passedTimeToLive(e.CreationTime) {

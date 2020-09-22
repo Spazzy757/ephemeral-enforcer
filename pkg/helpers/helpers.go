@@ -47,6 +47,16 @@ func homeDir() string {
 }
 
 /*
+GetEnv looks up an env key or returns a default
+*/
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
+/*
 EphemeralChecks Struct that holds the information of the resources that could be deleted
 */
 type EphemeralChecks struct {

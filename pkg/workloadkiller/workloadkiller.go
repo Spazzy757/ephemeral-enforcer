@@ -7,7 +7,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"log"
-	"os"
 )
 
 /*
@@ -19,19 +18,24 @@ KillWorkloads runs delete on all of the following in the namespace:
 - configmaps
 */
 func KillWorkloads(kubeconfig *rest.Config) {
-
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(kubeconfig)
 	if err != nil {
 		panic(err.Error())
 	}
-	namespace := os.Getenv("NAMESPACE")
-	// get pods in all the namespaces by omitting namespace
-	// Or specify namespace to get pods in particular namespace
+
+	// Look for namespace or default to default namespace
+	namespace := helpers.GetEnv("NAMESPACE", "default")
+
+	// Delete all Deployments
 	deleteDeployments(clientset, &namespace)
+	// Delete all Statefulsets
 	deleteStatefulsets(clientset, &namespace)
+	// Delete Services
 	deleteServices(clientset, &namespace)
+	// Delete All Secrets
 	deleteSecrets(clientset, &namespace)
+	// Delete All Configmaps
 	deleteConfigMaps(clientset, &namespace)
 }
 

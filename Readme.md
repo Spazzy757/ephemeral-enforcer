@@ -6,6 +6,13 @@
 
 Ephemeral Enforcer has one job, to destroy. Install it in a cluster and it will clean up resources after a predefined amount of time. This enforces your workloads to be ephemeral.
 
+**Why would I do that ?**
+
+* Demo environments 
+* End to End testing environment
+* Developer tooling and demos
+* Workloads not defined in code
+
 ## Getting Started:
 
 To deploy to a cluster:

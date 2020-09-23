@@ -28,15 +28,15 @@ func KillWorkloads(kubeconfig *rest.Config) {
 	namespace := helpers.GetEnv("NAMESPACE", "default")
 
 	// Delete all Deployments
-	deleteDeployments(clientset, &namespace)
+	go deleteDeployments(clientset, &namespace)
 	// Delete all Statefulsets
-	deleteStatefulsets(clientset, &namespace)
+	go deleteStatefulsets(clientset, &namespace)
 	// Delete Services
-	deleteServices(clientset, &namespace)
+	go deleteServices(clientset, &namespace)
 	// Delete All Secrets
-	deleteSecrets(clientset, &namespace)
+	go deleteSecrets(clientset, &namespace)
 	// Delete All Configmaps
-	deleteConfigMaps(clientset, &namespace)
+	go deleteConfigMaps(clientset, &namespace)
 }
 
 func getDeleteList(resourceList []helpers.EphemeralChecks) []string {
@@ -65,7 +65,6 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string) {
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Println(deleteList)
 	log.Printf("There are %d deployments scheduled for deletion\n", len(deleteList))
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {

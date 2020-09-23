@@ -118,3 +118,13 @@ jobs:
         platforms: linux/amd64,linux/arm64,linux/386
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.prep.outputs.tags }}
+    - name: Push to GitHub Packages
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.PACKAGE_TOKEN }}
+        registry: docker.pkg.github.com
+        repository: spazzy757/ephemeral-enforcer/ephemeral-enforcer
+        tag_with_ref: true
+        tag_with_sha: true
+

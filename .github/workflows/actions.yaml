@@ -53,6 +53,17 @@ jobs:
     # Run testing on the code
     - name: Run testing
       run: go test ./... -v
+
+    - name: Run Coverage
+      run: go test ./... -coverprofile=coverage.txt -covermode=atomic
+
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1.0.2
+      with:
+        token: ${{ secrets.CODCOV_TOKEN }}
+        file: ./coverage.txt
+        flags: unittests
+        name: codecov-umbrella
     
   # The "deploy" workflow
   deploy:

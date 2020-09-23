@@ -1,5 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Spazzy757/ephemeral-enforcer)](https://goreportcard.com/report/github.com/Spazzy757/ephemeral-enforcer)
 [![PkgGoDev](https://pkg.go.dev/badge/Spazzy757/ephemeral-enforcer)](https://pkg.go.dev/Spazzy757/ephemeral-enforcer)
+[![codecov](https://codecov.io/gh/spazzy757/ephemeral-enforcer/branch/master/graph/badge.svg)](https://codecov.io/gh/spazzy757/ephemeral-enforcer)
 # Kill All The Things
 
 ## How it works

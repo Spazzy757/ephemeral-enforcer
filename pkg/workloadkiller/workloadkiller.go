@@ -103,7 +103,7 @@ func deleteStatefulsets(clientset kubernetes.Interface, namespace *string) {
 	}
 }
 
-func deleteServices(clientset *kubernetes.Clientset, namespace *string) {
+func deleteServices(clientset kubernetes.Interface, namespace *string) {
 	client := clientset.CoreV1().Services(*namespace)
 	services, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -129,7 +129,7 @@ func deleteServices(clientset *kubernetes.Clientset, namespace *string) {
 	}
 }
 
-func deleteSecrets(clientset *kubernetes.Clientset, namespace *string) {
+func deleteSecrets(clientset kubernetes.Interface, namespace *string) {
 	client := clientset.CoreV1().Secrets(*namespace)
 	secrets, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -155,7 +155,7 @@ func deleteSecrets(clientset *kubernetes.Clientset, namespace *string) {
 	}
 }
 
-func deleteConfigMaps(clientset *kubernetes.Clientset, namespace *string) {
+func deleteConfigMaps(clientset kubernetes.Interface, namespace *string) {
 	client := clientset.CoreV1().ConfigMaps(*namespace)
 	configmaps, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

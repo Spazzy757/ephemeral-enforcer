@@ -12,6 +12,7 @@ import (
 )
 
 func TestDeleteDeployments(t *testing.T) {
+	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
 	fakeClientSet := fake.NewSimpleClientset(&appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        "ephemeral",
@@ -27,7 +28,6 @@ func TestDeleteDeployments(t *testing.T) {
 	})
 	t.Run("Test Delete Deployments", func(t *testing.T) {
 		namespace := "default"
-		os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
 		deleteDeployments(fakeClientSet, &namespace)
 		deployments, err := fakeClientSet.AppsV1().Deployments(namespace).List(
 			context.TODO(),

@@ -65,6 +65,7 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string) {
 		})
 	}
 	deleteList := getDeleteList(checks)
+	log.Println(deleteList)
 	log.Printf("There are %d deployments scheduled for deletion\n", len(deleteList))
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {

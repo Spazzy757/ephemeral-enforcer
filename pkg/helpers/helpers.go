@@ -81,13 +81,13 @@ func (e *EphemeralChecks) RunChecks() {
 }
 
 func nameCheck(name string) bool {
-	ephemeralEnforcerName := os.Getenv("EPHEMERAL_ENFORCER_NAME")
-	skippedPrefixes := os.Getenv("SKIPPED_PREFIXES")
+	ephemeralEnforcerName := GetEnv("EPHEMERAL_ENFORCER_NAME", "ephemeral-enforcer")
+	skippedPrefixes := GetEnv("SKIPPED_PREFIXES", "")
 	if strings.Contains(name, ephemeralEnforcerName) {
 		return false
 	}
 	for _, prefix := range strings.Split(skippedPrefixes, ",") {
-		if strings.Contains(name, prefix) {
+		if strings.Contains(name, prefix) && prefix != "" {
 			return false
 		}
 	}

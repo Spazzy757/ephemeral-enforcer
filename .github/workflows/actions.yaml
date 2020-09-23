@@ -48,7 +48,7 @@ jobs:
     
     # Run testing on the code
     - name: Run testing
-      run: go test ./...
+      run: go test ./... -v
     
   # The "deploy" workflow
   deploy:

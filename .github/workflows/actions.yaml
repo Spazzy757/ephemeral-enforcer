@@ -11,6 +11,10 @@ on:
   pull_request:
     branches:
     - master
+  release:
+    types:
+      - edited
+      - created
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

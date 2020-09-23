@@ -75,7 +75,7 @@ jobs:
     - name: Prepare
       id: prep
       run: |
-          DOCKER_IMAGE=spazzy757/ephemeral-enforcer
+          DOCKER_IMAGE=${{ secrets.DOCKER_REGISTRY }}
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly

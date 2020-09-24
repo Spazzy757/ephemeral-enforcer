@@ -3,8 +3,10 @@ package helpers
 import (
 	"flag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -17,26 +19,30 @@ GetConfig Gets the Kubernetes config from either your local (if you are running 
 or from the service account if you are running it in cluster
 */
 func GetConfig() *rest.Config {
-	if os.Getenv("IN_CLUSTER") != "true" {
-		var kubeconfig *string
-		if home := homeDir(); home != "" {
-			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-		} else {
-			kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-		}
-		flag.Parse()
-		config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-		// use the current context in kubeconfig
-		if err != nil {
-			panic(err.Error())
-		}
-		return config
-	}
-	config, err := rest.InClusterConfig()
+	var kubeconfig *string
+	home := homeDir()
+	kubeconfig = flag.String(
+		"kubeconfig",
+		filepath.Join(home, ".kube", "config"),
+		"(optional) absolute path to the kubeconfig file",
+	)
+	flag.Parse()
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 	return config
+}
+
+/*
+GetClientSet Generates a clientset from the Kubeconfig
+*/
+func GetClientSet(kubeconfig *rest.Config) (kubernetes.Interface, error) {
+	clientset, err := kubernetes.NewForConfig(kubeconfig)
+	if err != nil {
+		return nil, err
+	}
+	return clientset, nil
 }
 
 func homeDir() string {

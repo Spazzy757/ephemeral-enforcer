@@ -8,8 +8,50 @@ import (
 	fake "k8s.io/client-go/kubernetes/fake"
 	"log"
 	"os"
+	"sync"
 	"testing"
 )
+
+func TestKillWorkloads(t *testing.T) {
+	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
+	fakeClientSet := fake.NewSimpleClientset(
+		&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        "ephemeral",
+				Namespace:   "default",
+				Annotations: map[string]string{},
+			},
+		},
+		&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        "other",
+				Namespace:   "default",
+				Annotations: map[string]string{},
+			},
+		},
+		&appsv1.StatefulSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        "other",
+				Namespace:   "default",
+				Annotations: map[string]string{},
+			},
+		},
+	)
+	t.Run("Test Delete Deployments", func(t *testing.T) {
+		namespace := "default"
+		KillWorkloads(fakeClientSet)
+		deployments, err := fakeClientSet.AppsV1().Deployments(namespace).List(
+			context.TODO(),
+			metav1.ListOptions{},
+		)
+		if err != nil {
+			log.Fatal("Error:", err.Error())
+		}
+		if len(deployments.Items) != 1 {
+			t.Errorf("Expected No Deployments but got %v", len(deployments.Items))
+		}
+	})
+}
 
 func TestDeleteDeployments(t *testing.T) {
 	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
@@ -28,7 +70,10 @@ func TestDeleteDeployments(t *testing.T) {
 	})
 	t.Run("Test Delete Deployments", func(t *testing.T) {
 		namespace := "default"
-		deleteDeployments(fakeClientSet, &namespace)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteDeployments(fakeClientSet, &namespace, &wg)
+		wg.Wait()
 		deployments, err := fakeClientSet.AppsV1().Deployments(namespace).List(
 			context.TODO(),
 			metav1.ListOptions{},
@@ -59,7 +104,10 @@ func TestDeleteStatefulSets(t *testing.T) {
 	t.Run("Test Delete StatefulSets", func(t *testing.T) {
 		namespace := "default"
 		os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
-		deleteStatefulsets(fakeClientSet, &namespace)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteStatefulsets(fakeClientSet, &namespace, &wg)
+		wg.Wait()
 		statefulsets, err := fakeClientSet.AppsV1().StatefulSets(namespace).List(
 			context.TODO(),
 			metav1.ListOptions{},
@@ -90,7 +138,10 @@ func TestDeleteServices(t *testing.T) {
 	t.Run("Test Delete Services", func(t *testing.T) {
 		namespace := "default"
 		os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
-		deleteServices(fakeClientSet, &namespace)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteServices(fakeClientSet, &namespace, &wg)
+		wg.Wait()
 		services, err := fakeClientSet.CoreV1().Services(namespace).List(
 			context.TODO(),
 			metav1.ListOptions{},
@@ -121,7 +172,10 @@ func TestDeleteSecrets(t *testing.T) {
 	t.Run("Test Delete Services", func(t *testing.T) {
 		namespace := "default"
 		os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
-		deleteSecrets(fakeClientSet, &namespace)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteSecrets(fakeClientSet, &namespace, &wg)
+		wg.Wait()
 		secrets, err := fakeClientSet.CoreV1().Secrets(namespace).List(
 			context.TODO(),
 			metav1.ListOptions{},
@@ -152,7 +206,10 @@ func TestDeleteConfigMaps(t *testing.T) {
 	t.Run("Test Delete ConfigMaps", func(t *testing.T) {
 		namespace := "default"
 		os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
-		deleteConfigMaps(fakeClientSet, &namespace)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteConfigMaps(fakeClientSet, &namespace, &wg)
+		wg.Wait()
 		configmaps, err := fakeClientSet.CoreV1().ConfigMaps(namespace).List(
 			context.TODO(),
 			metav1.ListOptions{},

@@ -11,11 +11,15 @@ import (
 )
 
 func main() {
-	kubeconfig := helpers.GetConfig()
+	// Gets The Kube Config
+	kubeconfig, err := helpers.GetConfig()
+	if err != nil {
+		log.Fatalf("Error: %v", err.Error())
+	}
 	// creates the clientset
 	clientset, err := helpers.GetClientSet(kubeconfig)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf("Error: %v", err.Error())
 	}
 	c := cron.New(
 		cron.WithLogger(
@@ -28,7 +32,7 @@ func main() {
 		workloadkiller.KillWorkloads(clientset)
 	})
 	if err != nil {
-		log.Fatal("Error", err)
+		log.Fatalf("Error: %v", err.Error())
 	}
 	c.Start()
 	termChan := make(chan os.Signal, 1)

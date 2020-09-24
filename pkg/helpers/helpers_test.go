@@ -23,6 +23,17 @@ func TestGetEnv(t *testing.T) {
 	})
 }
 
+func TestGetConfig(t *testing.T) {
+	os.Setenv("HOME", "")
+	os.Setenv("USERPROFILE", "")
+	t.Run("Test if no Config Should Error", func(t *testing.T) {
+		_, err := GetConfig()
+		if err == nil {
+			t.Errorf("error should occur with no kubeconfig")
+		}
+	})
+}
+
 func TestHomeDir(t *testing.T) {
 	os.Setenv("HOME", "/ephemeral")
 	t.Run("Test Get Home Dir", func(t *testing.T) {

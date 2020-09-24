@@ -6,7 +6,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -18,7 +17,7 @@ import (
 GetConfig Gets the Kubernetes config from either your local (if you are running it locally)
 or from the service account if you are running it in cluster
 */
-func GetConfig() *rest.Config {
+func GetConfig() (*rest.Config, error) {
 	var kubeconfig *string
 	home := homeDir()
 	kubeconfig = flag.String(
@@ -29,9 +28,9 @@ func GetConfig() *rest.Config {
 	flag.Parse()
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
-	return config
+	return config, nil
 }
 
 /*

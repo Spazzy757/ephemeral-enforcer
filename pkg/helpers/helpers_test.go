@@ -23,6 +23,35 @@ func TestGetEnv(t *testing.T) {
 	})
 }
 
+func TestGetConfig(t *testing.T) {
+	os.Setenv("HOME", "")
+	os.Setenv("USERPROFILE", "")
+	t.Run("Test if no Config Should Error", func(t *testing.T) {
+		_, err := GetConfig()
+		if err == nil {
+			t.Errorf("error should occur with no kubeconfig")
+		}
+	})
+}
+
+func TestHomeDir(t *testing.T) {
+	os.Setenv("HOME", "/ephemeral")
+	t.Run("Test Get Home Dir", func(t *testing.T) {
+		h := homeDir()
+		if h != "/ephemeral" {
+			t.Errorf("home = %v; want /ephemeral", h)
+		}
+	})
+	os.Setenv("USERPROFILE", "/windows")
+	os.Setenv("HOME", "")
+	t.Run("Test Get Home Dir", func(t *testing.T) {
+		h := homeDir()
+		if h != "/windows" {
+			t.Errorf("home = %v; want /windows", h)
+		}
+	})
+}
+
 func TestCheckDeleteResourceAllowed(t *testing.T) {
 	os.Setenv("DISALLOW_LIST", "secrets,Statefulsets")
 	t.Run("Test Delete Resource Deployments", func(t *testing.T) {

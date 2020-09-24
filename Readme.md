@@ -25,9 +25,9 @@ kubectl -n $NAMESPACE kubectl apply -k manifests/
 ```
 ## Environment
 ```yaml
- # Can Be Run IN or OUt Of the Cluster
- - name: IN_CLUSTER
-   value: "true"
+ # Comma seperated list of resources t skip deleteing
+ - name: DISSALLOW_LIST
+   value: "statefulsets,secrets"
  # Which Namespace To Kill Workloads
  - name: NAMESPACE
    value: example

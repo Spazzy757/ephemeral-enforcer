@@ -109,3 +109,16 @@ func passedTimeToLive(creationTime metav1.Time) bool {
 	ttlTime := metav1.NewTime(previousTime)
 	return creationTime.Before(&ttlTime)
 }
+
+/*
+CheckDeleteResourceAllowed Checks if the resource is in the disallow list
+*/
+func CheckDeleteResourceAllowed(resourceType string) bool {
+	disallowList := GetEnv("DISALLOW_LIST", "")
+	for _, element := range strings.Split(disallowList, ",") {
+		if strings.Contains(strings.ToLower(resourceType), strings.ToLower(element)) && element != "" {
+			return false
+		}
+	}
+	return true
+}

@@ -24,15 +24,25 @@ func KillWorkloads(clientset kubernetes.Interface) {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	// Delete all Deployments
-	go deleteDeployments(clientset, &namespace, &wg)
+	if helpers.CheckDeleteResourceAllowed("deployments") {
+		go deleteDeployments(clientset, &namespace, &wg)
+	}
 	// Delete all Statefulsets
-	go deleteStatefulsets(clientset, &namespace, &wg)
+	if helpers.CheckDeleteResourceAllowed("statefulsets") {
+		go deleteStatefulsets(clientset, &namespace, &wg)
+	}
 	// Delete Services
-	go deleteServices(clientset, &namespace, &wg)
+	if helpers.CheckDeleteResourceAllowed("services") {
+		go deleteServices(clientset, &namespace, &wg)
+	}
 	// Delete All Secrets
-	go deleteSecrets(clientset, &namespace, &wg)
+	if helpers.CheckDeleteResourceAllowed("secrets") {
+		go deleteSecrets(clientset, &namespace, &wg)
+	}
 	// Delete All Configmaps
-	go deleteConfigMaps(clientset, &namespace, &wg)
+	if helpers.CheckDeleteResourceAllowed("configmaps") {
+		go deleteConfigMaps(clientset, &namespace, &wg)
+	}
 	// wait for processes to finish
 	wg.Wait()
 }

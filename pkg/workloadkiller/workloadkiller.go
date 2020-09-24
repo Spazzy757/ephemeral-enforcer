@@ -5,8 +5,8 @@ import (
 	"github.com/spazzy757/ephemeral-enforcer/pkg/helpers"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"log"
+	"sync"
 )
 
 /*
@@ -17,26 +17,24 @@ KillWorkloads runs delete on all of the following in the namespace:
 - secrets
 - configmaps
 */
-func KillWorkloads(kubeconfig *rest.Config) {
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(kubeconfig)
-	if err != nil {
-		panic(err.Error())
-	}
-
+func KillWorkloads(clientset kubernetes.Interface) {
 	// Look for namespace or default to default namespace
 	namespace := helpers.GetEnv("NAMESPACE", "default")
-
+	// Wait Group To handle the waiting for all deletes to complete
+	var wg sync.WaitGroup
+	wg.Add(5)
 	// Delete all Deployments
-	go deleteDeployments(clientset, &namespace)
+	go deleteDeployments(clientset, &namespace, &wg)
 	// Delete all Statefulsets
-	go deleteStatefulsets(clientset, &namespace)
+	go deleteStatefulsets(clientset, &namespace, &wg)
 	// Delete Services
-	go deleteServices(clientset, &namespace)
+	go deleteServices(clientset, &namespace, &wg)
 	// Delete All Secrets
-	go deleteSecrets(clientset, &namespace)
+	go deleteSecrets(clientset, &namespace, &wg)
 	// Delete All Configmaps
-	go deleteConfigMaps(clientset, &namespace)
+	go deleteConfigMaps(clientset, &namespace, &wg)
+	// wait for processes to finish
+	wg.Wait()
 }
 
 func getDeleteList(resourceList []helpers.EphemeralChecks) []string {
@@ -50,7 +48,8 @@ func getDeleteList(resourceList []helpers.EphemeralChecks) []string {
 	return deleteList
 }
 
-func deleteDeployments(clientset kubernetes.Interface, namespace *string) {
+func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := clientset.AppsV1().Deployments(*namespace)
 	deployments, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -77,7 +76,8 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string) {
 
 }
 
-func deleteStatefulsets(clientset kubernetes.Interface, namespace *string) {
+func deleteStatefulsets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := clientset.AppsV1().StatefulSets(*namespace)
 	statefulsets, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -103,7 +103,8 @@ func deleteStatefulsets(clientset kubernetes.Interface, namespace *string) {
 	}
 }
 
-func deleteServices(clientset kubernetes.Interface, namespace *string) {
+func deleteServices(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := clientset.CoreV1().Services(*namespace)
 	services, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -129,7 +130,8 @@ func deleteServices(clientset kubernetes.Interface, namespace *string) {
 	}
 }
 
-func deleteSecrets(clientset kubernetes.Interface, namespace *string) {
+func deleteSecrets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := clientset.CoreV1().Secrets(*namespace)
 	secrets, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -155,7 +157,8 @@ func deleteSecrets(clientset kubernetes.Interface, namespace *string) {
 	}
 }
 
-func deleteConfigMaps(clientset kubernetes.Interface, namespace *string) {
+func deleteConfigMaps(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := clientset.CoreV1().ConfigMaps(*namespace)
 	configmaps, err := client.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

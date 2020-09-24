@@ -23,6 +23,22 @@ func TestGetEnv(t *testing.T) {
 	})
 }
 
+func TestCheckDeleteResourceAllowed(t *testing.T) {
+	os.Setenv("DISALLOW_LIST", "secrets,Statefulsets")
+	t.Run("Test Delete Resource Deployments", func(t *testing.T) {
+		check := CheckDeleteResourceAllowed("deployments")
+		if !check {
+			t.Errorf("check = %v", check)
+		}
+	})
+	t.Run("Test Delete Resource Secrets Fails", func(t *testing.T) {
+		check := CheckDeleteResourceAllowed("secrets")
+		if check {
+			t.Errorf("check = %v", check)
+		}
+	})
+}
+
 func TestNameCheck(t *testing.T) {
 	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
 	os.Setenv("SKIPPED_PREFIXES", "kube,default")

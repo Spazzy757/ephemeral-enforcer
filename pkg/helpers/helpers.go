@@ -19,24 +19,17 @@ GetConfig Gets the Kubernetes config from either your local (if you are running 
 or from the service account if you are running it in cluster
 */
 func GetConfig() *rest.Config {
-	if os.Getenv("IN_CLUSTER") != "true" {
-		var kubeconfig *string
-		home := homeDir()
-		kubeconfig = flag.String(
-			"kubeconfig",
-			filepath.Join(home, ".kube", "config"),
-			"(optional) absolute path to the kubeconfig file",
-		)
-		flag.Parse()
-		config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		return config
-	}
-	config, err := rest.InClusterConfig()
+	var kubeconfig *string
+	home := homeDir()
+	kubeconfig = flag.String(
+		"kubeconfig",
+		filepath.Join(home, ".kube", "config"),
+		"(optional) absolute path to the kubeconfig file",
+	)
+	flag.Parse()
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 	return config
 }
@@ -44,12 +37,12 @@ func GetConfig() *rest.Config {
 /*
 GetClientSet Generates a clientset from the Kubeconfig
 */
-func GetClientSet(kubeconfig *rest.Config) kubernetes.Interface {
+func GetClientSet(kubeconfig *rest.Config) (kubernetes.Interface, error) {
 	clientset, err := kubernetes.NewForConfig(kubeconfig)
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
-	return clientset
+	return clientset, nil
 }
 
 func homeDir() string {

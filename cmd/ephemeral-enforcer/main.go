@@ -13,7 +13,10 @@ import (
 func main() {
 	kubeconfig := helpers.GetConfig()
 	// creates the clientset
-	clientset := helpers.GetClientSet(kubeconfig)
+	clientset, err := helpers.GetClientSet(kubeconfig)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 	c := cron.New(
 		cron.WithLogger(
 			cron.VerbosePrintfLogger(
@@ -21,7 +24,7 @@ func main() {
 			),
 		),
 	)
-	_, err := c.AddFunc(os.Getenv("ENFORCER_SCHEDULE"), func() {
+	_, err = c.AddFunc(os.Getenv("ENFORCER_SCHEDULE"), func() {
 		workloadkiller.KillWorkloads(clientset)
 	})
 	if err != nil {

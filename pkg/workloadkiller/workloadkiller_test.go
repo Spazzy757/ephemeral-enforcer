@@ -87,6 +87,40 @@ func TestDeleteDeployments(t *testing.T) {
 	})
 }
 
+func TestDeleteDaemonSets(t *testing.T) {
+	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
+	fakeClientSet := fake.NewSimpleClientset(&appsv1.DaemonSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        "ephemeral",
+			Namespace:   "default",
+			Annotations: map[string]string{},
+		},
+	}, &appsv1.DaemonSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        "other",
+			Namespace:   "default",
+			Annotations: map[string]string{},
+		},
+	})
+	t.Run("Test Delete DaemonSets", func(t *testing.T) {
+		namespace := "default"
+		var wg sync.WaitGroup
+		wg.Add(1)
+		deleteDaemonSets(fakeClientSet, &namespace, &wg)
+		wg.Wait()
+		daemonsets, err := fakeClientSet.AppsV1().DaemonSets(namespace).List(
+			context.TODO(),
+			metav1.ListOptions{},
+		)
+		if err != nil {
+			log.Fatal("Error:", err.Error())
+		}
+		if len(daemonsets.Items) != 1 {
+			t.Errorf("Expected No DaemonSets but got %v", len(daemonsets.Items))
+		}
+	})
+}
+
 func TestDeleteStatefulSets(t *testing.T) {
 	fakeClientSet := fake.NewSimpleClientset(&appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{

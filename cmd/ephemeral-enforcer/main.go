@@ -11,13 +11,8 @@ import (
 )
 
 func main() {
-	// Gets The Kube Config
-	kubeconfig, err := helpers.GetConfig()
-	if err != nil {
-		log.Fatalf("Error: %v", err.Error())
-	}
 	// creates the clientset
-	clientset, err := helpers.GetClientSet(kubeconfig)
+	clientset, err := helpers.GetClientSet()
 	if err != nil {
 		log.Fatalf("Error: %v", err.Error())
 	}

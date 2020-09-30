@@ -7,5 +7,5 @@ rules:
   resources: ["secrets", "configmaps", "services"]
   verbs: ["delete", "watch", "list"]
 - apiGroups: ["apps"] # "" indicates the core API group
-  resources: ["deployments", "statefulsets"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
   verbs: ["delete", "watch", "list"]

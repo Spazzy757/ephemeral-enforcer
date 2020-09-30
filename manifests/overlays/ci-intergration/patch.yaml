@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ephemeral-enforcer
+  name: ephemeral-enforcer
+spec:
+  template:
+    spec:
+      containers:
+      - image: spazzy757/ephemeral-enforcer:edge
+        name: ephemeral-enforcer
+        env:
+        # Can Be Run IN or OUt Of the Cluster
+        - name: IN_CLUSTER
+          value: "true"
+        # Which Namespace To Run in the Deletes
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        # Name of the Enforcer (So it doesnt delete itself)
+        - name: EPHEMERAL_ENFORCER_NAME
+          value: "ephemeral-enforcer"
+        # Comma Seperated List of Prefixes to skip
+        - name: SKIPPED_PREFIXES
+          value: "default,kube"
+        # When Should the Enforcer Check
+        - name: ENFORCER_SCHEDULE
+          value: "*/1 * * * *"
+        # How Long Workloads Should Be Allowed to Live For
+        - name: WORKLOAD_TTL
+          value: "1"

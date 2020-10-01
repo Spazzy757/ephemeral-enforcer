@@ -22,7 +22,7 @@ func KillWorkloads(clientset kubernetes.Interface) {
 	namespace := helpers.GetEnv("NAMESPACE", "default")
 	// Wait Group To handle the waiting for all deletes to complete
 	var wg sync.WaitGroup
-	wg.Add(5)
+	wg.Add(6)
 	// Delete all Deployments
 	if helpers.CheckDeleteResourceAllowed("deployments") {
 		go deleteDeployments(clientset, &namespace, &wg)
@@ -42,6 +42,10 @@ func KillWorkloads(clientset kubernetes.Interface) {
 	// Delete All Configmaps
 	if helpers.CheckDeleteResourceAllowed("configmaps") {
 		go deleteConfigMaps(clientset, &namespace, &wg)
+	}
+	// Delete All Daemonsets
+	if helpers.CheckDeleteResourceAllowed("daemonsets") {
+		go deleteDaemonSets(clientset, &namespace, &wg)
 	}
 	// wait for processes to finish
 	wg.Wait()
@@ -83,7 +87,6 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sy
 			log.Fatal(err)
 		}
 	}
-
 }
 
 func deleteStatefulsets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
@@ -184,6 +187,33 @@ func deleteConfigMaps(clientset kubernetes.Interface, namespace *string, wg *syn
 	}
 	deleteList := getDeleteList(checks)
 	log.Printf("There are %d configmaps scheduled for deletion\n", len(deleteList))
+	deletePolicy := metav1.DeletePropagationForeground
+	for _, element := range deleteList {
+		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{
+			PropagationPolicy: &deletePolicy,
+		}); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func deleteDaemonSets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	client := clientset.AppsV1().DaemonSets(*namespace)
+	daemonsets, err := client.List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+	}
+	checks := []helpers.EphemeralChecks{}
+	for _, element := range daemonsets.Items {
+		checks = append(checks, helpers.EphemeralChecks{
+			Name:         element.Name,
+			CreationTime: element.CreationTimestamp,
+			Delete:       false,
+		})
+	}
+	deleteList := getDeleteList(checks)
+	log.Printf("There are %d daemonsets scheduled for deletion\n", len(deleteList))
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{

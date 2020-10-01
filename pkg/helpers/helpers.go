@@ -1,54 +1,31 @@
 package helpers
 
 import (
-	"flag"
+	//"flag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
+	//"k8s.io/client-go/tools/clientcmd"
 	"os"
-	"path/filepath"
+	//	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 )
 
 /*
-GetConfig Gets the Kubernetes config from either your local (if you are running it locally)
-or from the service account if you are running it in cluster
+GetClientSet Generates a clientset from the Kubeconfig
 */
-func GetConfig() (*rest.Config, error) {
-	var kubeconfig *string
-	home := homeDir()
-	kubeconfig = flag.String(
-		"kubeconfig",
-		filepath.Join(home, ".kube", "config"),
-		"(optional) absolute path to the kubeconfig file",
-	)
-	flag.Parse()
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+func GetClientSet() (kubernetes.Interface, error) {
+	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
-	return config, nil
-}
-
-/*
-GetClientSet Generates a clientset from the Kubeconfig
-*/
-func GetClientSet(kubeconfig *rest.Config) (kubernetes.Interface, error) {
-	clientset, err := kubernetes.NewForConfig(kubeconfig)
+	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
 	return clientset, nil
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }
 
 /*

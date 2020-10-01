@@ -5,7 +5,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: ephemeral-enforcer
-  namespace: test
+  namespace: default
 roleRef:
   kind: Role
   name: ephemeral-enforcer

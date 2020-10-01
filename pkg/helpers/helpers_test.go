@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+func TestGetClientSet(t *testing.T) {
+	t.Run("Test Unset Environment Returns Default", func(t *testing.T) {
+		_, err := GetClientSet()
+		if err == nil {
+			t.Errorf("expected an error but got none")
+		}
+	})
+}
+
 func TestGetEnv(t *testing.T) {
 	os.Setenv("SET_ENV", "1")
 	t.Run("Test Unset Environment Returns Default", func(t *testing.T) {

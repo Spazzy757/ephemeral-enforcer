@@ -14,7 +14,7 @@ Ephemeral Enforcer has one job, to destroy. Install it in a cluster and it will 
 * Developer tooling and demos
 * Workloads not defined in code
 
-## Getting Started:
+## Getting Started
 
 To deploy to a cluster:
 

@@ -62,6 +62,13 @@ func getDeleteList(resourceList []helpers.EphemeralChecks) []string {
 	return deleteList
 }
 
+/*
+logDeletes will output the number and the resource that is being deleted
+*/
+func logDeletes(number int, resource string) {
+	log.Printf("There are %d %v scheduled for deletion\n", number, resource)
+}
+
 func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.AppsV1().Deployments(*namespace)
@@ -78,7 +85,7 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sy
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Printf("There are %d deployments scheduled for deletion\n", len(deleteList))
+	logDeletes(len(deleteList), "deployments")
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{
@@ -105,7 +112,7 @@ func deleteStatefulsets(clientset kubernetes.Interface, namespace *string, wg *s
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Printf("There are %d statefulsets scheduled for deletion\n", len(deleteList))
+	logDeletes(len(deleteList), "statefulsets")
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{
@@ -132,7 +139,7 @@ func deleteServices(clientset kubernetes.Interface, namespace *string, wg *sync.
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Printf("There are %d services scheduled for deletion\n", len(deleteList))
+	logDeletes(len(deleteList), "services")
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{
@@ -159,7 +166,7 @@ func deleteSecrets(clientset kubernetes.Interface, namespace *string, wg *sync.W
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Printf("There are %d secrets scheduled for deletion\n", len(deleteList))
+	logDeletes(len(deleteList), "secrets")
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{
@@ -186,7 +193,7 @@ func deleteConfigMaps(clientset kubernetes.Interface, namespace *string, wg *syn
 		})
 	}
 	deleteList := getDeleteList(checks)
-	log.Printf("There are %d configmaps scheduled for deletion\n", len(deleteList))
+	logDeletes(len(deleteList), "configmaps")
 	deletePolicy := metav1.DeletePropagationForeground
 	for _, element := range deleteList {
 		if err := client.Delete(context.TODO(), element, metav1.DeleteOptions{

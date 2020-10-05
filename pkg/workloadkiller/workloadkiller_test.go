@@ -1,6 +1,7 @@
 package workloadkiller
 
 import (
+	"bytes"
 	"context"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -8,6 +9,7 @@ import (
 	fake "k8s.io/client-go/kubernetes/fake"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 )
@@ -49,6 +51,19 @@ func TestKillWorkloads(t *testing.T) {
 		}
 		if len(deployments.Items) != 1 {
 			t.Errorf("Expected No Deployments but got %v", len(deployments.Items))
+		}
+	})
+}
+
+func TestLogDeletes(t *testing.T) {
+	var output bytes.Buffer
+	t.Run("Testing logs the correct output", func(t *testing.T) {
+		log.SetOutput(&output)
+		logDeletes(1, "deployments")
+		expected := "There are 1 deployments scheduled for deletion"
+		got := strings.TrimSuffix(output.String(), "\n")
+		if !strings.Contains(got, expected) {
+			t.Errorf("expected - %v, got - %v", expected, got)
 		}
 	})
 }

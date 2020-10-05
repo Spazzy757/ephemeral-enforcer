@@ -48,29 +48,6 @@ func TestCheckDeleteResourceAllowed(t *testing.T) {
 	})
 }
 
-func TestNameCheck(t *testing.T) {
-	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
-	os.Setenv("SKIPPED_PREFIXES", "kube,default")
-	t.Run("Should return false for EPHEMERAL_ENFORCER_NAME", func(t *testing.T) {
-		deleteCheck := nameCheck("ephemeral-1234")
-		if deleteCheck {
-			t.Errorf("deleteCheck = %v; want false", deleteCheck)
-		}
-	})
-	t.Run("Should return false for SKIPPED_PREFIXES", func(t *testing.T) {
-		deleteCheck := nameCheck("default-1234")
-		if deleteCheck {
-			t.Errorf("deleteCheck = %v; want false", deleteCheck)
-		}
-	})
-	t.Run("Should return true for everything else", func(t *testing.T) {
-		deleteCheck := nameCheck("pod-1234")
-		if !deleteCheck {
-			t.Errorf("deleteCheck = %v; want true", deleteCheck)
-		}
-	})
-}
-
 func TestPassedTimeToLive(t *testing.T) {
 	os.Setenv("WORKLOAD_TTL", "1")
 	t.Run("Should return false for time thats not over ttl", func(t *testing.T) {
@@ -91,7 +68,6 @@ func TestPassedTimeToLive(t *testing.T) {
 
 func TestEphemeralChecks(t *testing.T) {
 	os.Setenv("WORKLOAD_TTL", "1")
-	os.Setenv("EPHEMERAL_ENFORCER_NAME", "ephemeral")
 	t.Run("Should fail Ephemeral Checks", func(t *testing.T) {
 		creationTime := time.Now().Add(time.Minute * time.Duration(2))
 		shouldDelete := EphemeralChecks{

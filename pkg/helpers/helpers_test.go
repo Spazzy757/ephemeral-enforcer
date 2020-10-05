@@ -69,19 +69,19 @@ func TestPassedTimeToLive(t *testing.T) {
 func TestEphemeralChecks(t *testing.T) {
 	os.Setenv("WORKLOAD_TTL", "1")
 	t.Run("Should fail Ephemeral Checks", func(t *testing.T) {
-		creationTime := time.Now().Add(time.Minute * time.Duration(2))
+		creationTime := time.Now().Add(0 - (time.Minute * time.Duration(3)))
 		shouldDelete := EphemeralChecks{
 			Name:         "pod-1234",
 			CreationTime: metav1.NewTime(creationTime),
 			Delete:       false,
 		}
 		shouldDelete.RunChecks()
-		if shouldDelete.Delete {
+		if !shouldDelete.Delete {
 			t.Errorf("delete = %v; want true", shouldDelete.Delete)
 		}
 	})
 	t.Run("Should pass Ephemeral Checks", func(t *testing.T) {
-		creationTime := time.Now().Add(time.Minute * time.Duration(2))
+		creationTime := time.Now().Add(time.Minute * time.Duration(1))
 		shouldNotDelete := EphemeralChecks{
 			Name:         "ephemeral-1234",
 			CreationTime: metav1.NewTime(creationTime),

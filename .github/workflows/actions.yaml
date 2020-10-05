@@ -171,7 +171,7 @@ jobs:
         kubectl create deployment kill-me --image=k8s.gcr.io/echoserver:1.4
     - name: Check Deployment is Up
       run: |
-        ./ci/check-deployment.sh kill-me
+        kubectl wait --for=condition=available --timeout=600s deployment/kill-me
     - name: Deploy Ephemeral Latest Enforcer
       run: |
         curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
@@ -181,7 +181,7 @@ jobs:
         kustomize build . | kubectl apply -f  -
     - name: Check Ephemeral Enforcer Is Up
       run: |
-        ./ci/check-deployment.sh ephemeral-enforcer
+        kubectl wait --for=condition=available --timeout=600s deployment/ephemeral-enforcer
     - name: Check Deployment is Killed
       run: |
         ./ci/check-deployment-killed.sh kill-me

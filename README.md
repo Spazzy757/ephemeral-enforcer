@@ -31,16 +31,16 @@ kubectl -n $NAMESPACE kubectl apply -k manifests/
  # Which Namespace To Kill Workloads
  - name: NAMESPACE
    value: example
- # Name of the Enforcer (So it doesnt delete itself)
- - name: EPHEMERAL_ENFORCER_NAME
-   value: "ephemeral-enforcer"
- # Comma Seperated List of Prefixes to skip
- - name: SKIPPED_PREFIXES
-   value: "default,kube"
  # When Should the Enforcer Check
  - name: ENFORCER_SCHEDULE
    value: "*/5 * * * *"
  # How Long Workloads Should Be Allowed to Live For (in minutes)
  - name: WORKLOAD_TTL
    value: "60"
+```
+
+If you would like to ephemeral enforcer to not delete your resource you can label it:
+
+```bash
+kubectl label deployment my-awesome-deployment ephemeral-enforcer=safe
 ```

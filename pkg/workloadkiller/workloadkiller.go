@@ -69,10 +69,17 @@ func logDeletes(number int, resource string) {
 	log.Printf("There are %d %v scheduled for deletion\n", number, resource)
 }
 
+/*
+getLabelSelectors returns the label selector that is used to get pods to delete
+*/
+func getLabelSelectors() string {
+	return "!ephemeral-enforcer"
+}
+
 func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.AppsV1().Deployments(*namespace)
-	deployments, err := client.List(context.TODO(), metav1.ListOptions{})
+	deployments, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -99,7 +106,7 @@ func deleteDeployments(clientset kubernetes.Interface, namespace *string, wg *sy
 func deleteStatefulsets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.AppsV1().StatefulSets(*namespace)
-	statefulsets, err := client.List(context.TODO(), metav1.ListOptions{})
+	statefulsets, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -126,7 +133,7 @@ func deleteStatefulsets(clientset kubernetes.Interface, namespace *string, wg *s
 func deleteServices(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.CoreV1().Services(*namespace)
-	services, err := client.List(context.TODO(), metav1.ListOptions{})
+	services, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -153,7 +160,7 @@ func deleteServices(clientset kubernetes.Interface, namespace *string, wg *sync.
 func deleteSecrets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.CoreV1().Secrets(*namespace)
-	secrets, err := client.List(context.TODO(), metav1.ListOptions{})
+	secrets, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -180,7 +187,7 @@ func deleteSecrets(clientset kubernetes.Interface, namespace *string, wg *sync.W
 func deleteConfigMaps(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.CoreV1().ConfigMaps(*namespace)
-	configmaps, err := client.List(context.TODO(), metav1.ListOptions{})
+	configmaps, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -207,7 +214,7 @@ func deleteConfigMaps(clientset kubernetes.Interface, namespace *string, wg *syn
 func deleteDaemonSets(clientset kubernetes.Interface, namespace *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	client := clientset.AppsV1().DaemonSets(*namespace)
-	daemonsets, err := client.List(context.TODO(), metav1.ListOptions{})
+	daemonsets, err := client.List(context.TODO(), metav1.ListOptions{LabelSelector: getLabelSelectors()})
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}

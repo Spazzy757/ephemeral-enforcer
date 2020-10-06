@@ -22,6 +22,9 @@ func TestKillWorkloads(t *testing.T) {
 				Name:        "ephemeral",
 				Namespace:   "default",
 				Annotations: map[string]string{},
+				Labels: map[string]string{
+					"ephemeral-enforcer": "safe",
+				},
 			},
 		},
 		&appsv1.Deployment{
@@ -75,6 +78,9 @@ func TestDeleteDeployments(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -109,6 +115,9 @@ func TestDeleteDaemonSets(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
@@ -142,6 +151,9 @@ func TestDeleteStatefulSets(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
@@ -176,6 +188,9 @@ func TestDeleteServices(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -210,6 +225,9 @@ func TestDeleteSecrets(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -244,6 +262,9 @@ func TestDeleteConfigMaps(t *testing.T) {
 			Name:        "ephemeral",
 			Namespace:   "default",
 			Annotations: map[string]string{},
+			Labels: map[string]string{
+				"ephemeral-enforcer": "safe",
+			},
 		},
 	}, &v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{

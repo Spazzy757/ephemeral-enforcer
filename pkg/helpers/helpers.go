@@ -42,8 +42,8 @@ func GetEnv(key, fallback string) string {
 EphemeralChecks Struct that holds the information of the resources that could be deleted
 */
 type EphemeralChecks struct {
-	CreationTime metav1.Time
 	Name         string
+	CreationTime metav1.Time
 	Delete       bool
 }
 
@@ -55,25 +55,6 @@ func (e *EphemeralChecks) RunChecks() {
 	if passedTimeToLive(e.CreationTime) {
 		e.Delete = true
 	}
-	// Run The Check for Skipped Names
-	if !nameCheck(e.Name) {
-		e.Delete = false
-	}
-
-}
-
-func nameCheck(name string) bool {
-	ephemeralEnforcerName := GetEnv("EPHEMERAL_ENFORCER_NAME", "ephemeral-enforcer")
-	skippedPrefixes := GetEnv("SKIPPED_PREFIXES", "")
-	if strings.Contains(name, ephemeralEnforcerName) {
-		return false
-	}
-	for _, prefix := range strings.Split(skippedPrefixes, ",") {
-		if strings.Contains(name, prefix) && prefix != "" {
-			return false
-		}
-	}
-	return true
 }
 
 func passedTimeToLive(creationTime metav1.Time) bool {

@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: ephemeral-enforcer
+    ephemeral-enforcer: safe
   name: ephemeral-enforcer
 spec:
   replicas: 1
